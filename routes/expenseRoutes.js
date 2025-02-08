@@ -58,12 +58,29 @@ router.get("/", async (req, res) => {
 });
 
 // Delete an expense
+
 router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Check if the id is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid ID format" });
+    }
+
+    // Check if the expense exists
+    const expense = await Expense.findById(id);
+    if (!expense) {
+      return res.status(404).json({ message: "Expense not found!" });
+    }
+
+    // Proceed with deletion
     await Expense.findByIdAndDelete(id);
+
+    // Send success response
     res.status(200).json({ message: "Expense deleted successfully!" });
   } catch (error) {
+    console.error("Error deleting expense:", error);
     res.status(500).json({ error: error.message });
   }
 });
