@@ -57,19 +57,29 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/delete/:id", async (req, res) => {
   try {
     const { id } = req.params;
+    const { user } = req.body;
 
-    // Check if the id is provided
+    // Validate that user and ID are provided
+    if (!user) {
+      return res.status(404).json({ message: "User Not Found!" }); // Return after sending the response
+    }
+
     if (!id) {
       return res.status(404).json({ message: "Id Not Found!" }); // Return after sending the response
     }
 
-    // Check if the expense exists
-    const idexisit = await Expense.findById(id);
-    if (!idexisit) {
+    // Check if the expense exists and is owned by the user
+    const expense = await Expense.findById(id);
+    if (!expense) {
       return res.status(400).json({ message: "Expense Not Found!" }); // Return after sending the response
+    }
+
+    // Optionally check if the expense belongs to the user (if applicable)
+    if (expense.user.toString() !== user) {
+      return res.status(403).json({ message: "Unauthorized: You can only delete your own expenses!" });
     }
 
     // Proceed with deletion
@@ -77,9 +87,11 @@ router.delete("/:id", async (req, res) => {
 
     // Send success response
     return res.status(200).json({ message: "Expense deleted successfully!" });
+
   } catch (error) {
     // Handle errors
     console.error("Error deleting expense:", error);
+
     if (!res.headersSent) {
       // Check if headers have already been sent
       return res.status(500).json({ error: error.message });
