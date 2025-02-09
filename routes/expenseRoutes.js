@@ -51,6 +51,7 @@ router.post("/edit/:id", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const expenses = await Expense.find();
+    console.log(expenses);
     res.status(200).json(expenses);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -62,13 +63,13 @@ router.get("/load/:uid", async (req, res) => {
     const { uid } = req.params; // Get the userId from the request params
 
     // Find all expenses for the specific user
-    const expenses = await Expense.find({ userId: uid });
+    const expenses = await Expense.find({ user: uid });
 
     // Check if expenses are found
     if (!expenses) {
       return res.status(404).json({ message: "No expenses found for this user" });
     }
-
+    console.log(expenses);
     // Respond with the list of expenses
     res.status(200).json(expenses);
   } catch (error) {
