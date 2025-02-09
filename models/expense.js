@@ -12,16 +12,18 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model("User", userSchema);
 
 // Expense Schema
-const expenseSchema = new mongoose.Schema({
+const transactionSchema = new mongoose.Schema({
   name: { type: String, required: true },
   amount: { type: Number, required: true },
   category: { type: String, required: true },
+  type: { type: String, enum: ["income", "expense"], required: true },
   description: { type: String },
   date: { type: Date, default: Date.now },
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // Reference to User
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
 });
 
 // Export Expense model
-const Expense = mongoose.model("Expense", expenseSchema);
+const Expense = mongoose.model("Expense", transactionSchema);
+
 
 module.exports = { User, Expense };

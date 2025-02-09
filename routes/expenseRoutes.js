@@ -5,11 +5,23 @@ const { Expense } = require("../models/expense");
 // Add an expense
 router.post("/add", async (req, res) => {
   try {
-    const { name, amount, category, description, user } = req.body;
-    const expense = new Expense({ name, amount, category, description, user });
-    await expense.save();
-    console.log(expense);
-    res.status(201).json({ message: "Expense added successfully!" });
+    const { name, amount, category, description, user, type } = req.body;
+
+    // Validate that necessary fields are present
+    if (!name || !amount || !category || !user || !type) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+    // Validate the `type` field
+    if (!["income", "expense"].includes(type)) {
+      return res.status(400).json({ message: "Invalid type. Must be 'income' or 'expense'." });
+    }
+
+    // Create a new document using the appropriate model
+    const entry = new Expense({ name, amount, category, description, user, type });
+    await entry.save();
+
+    console.log(entry);
+    res.status(201).json({ message: `${type.charAt(0).toUpperCase() + type.slice(1)} added successfully!` });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
