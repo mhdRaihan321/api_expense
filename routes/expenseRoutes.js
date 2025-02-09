@@ -56,6 +56,26 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+// Get expenses for a specific user by userId
+router.get("/load/:uid", async (req, res) => {
+  try {
+    const { uid } = req.params; // Get the userId from the request params
+
+    // Find all expenses for the specific user
+    const expenses = await Expense.find({ userId: uid });
+
+    // Check if expenses are found
+    if (!expenses) {
+      return res.status(404).json({ message: "No expenses found for this user" });
+    }
+
+    // Respond with the list of expenses
+    res.status(200).json(expenses);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 router.delete("/delete/:id", async (req, res) => {
   try {
